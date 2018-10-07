@@ -1,0 +1,1026 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>NCAA Statistics</title>
+    <link href="/assets/application-170eafbb8c3b9696c70ad3924d5cfc06.css" media="all" rel="stylesheet" type="text/css" />
+    <script src="/assets/application-183f06be5d436d0ff4e2e4ef14afb738.js" type="text/javascript"></script>
+    <meta content="authenticity_token" name="csrf-param" />
+<meta content="+cAVXGMu7+aHy6yylv5xpK/aBhzBC3WBNYIZCeATNjE=" name="csrf-token" />
+    <style>
+tfoot tr:nth-child(n+2){
+  border: initial;
+  font-weight: initial;
+}
+tfoot tr:nth-child(n+2) td{
+  border: initial;
+  font-weight: initial;
+}
+    </style>
+  </head>
+  
+  <script>
+  $.ajaxSetup ({
+    // Disable caching of AJAX responses
+    cache: false
+  });
+  function changeSport(field){
+    var el = $(field);
+    var tmList = el.parent().next().find('.new-team-year')[0];
+    if (tmList == null){
+      tmList = el.nextAll('.new-team-year')[0];
+    }
+    $.ajax({
+      url: "/game_sport_year_ctls/"+el.val()+"/available_teams",
+      dataType: "script",
+      success: function(data, status){
+        $(tmList).empty();
+        $(tmList).append(("<option value=''>Select team</option>"));
+        $.each(JSON.parse(data), function(k, v){
+          $(tmList).append($("<option></option>")
+              .attr("value", v["id"])
+              .text(v["member_org"]["name_tabular"]));
+        });
+        $(tmList).trigger("chosen:updated");
+      }
+    });
+  }
+    function set_process_styles(fld, start_color, end_color){
+       $('#'+fld).effect('highlight', {color: '#99CC99'}, 6000);
+    }
+    var downImage = "/assets/down12.gif";
+    var rightImage = "/assets/right12.gif";
+    function highlight(div_id){
+      $(div_id).effect('highlight', {color: '#99CC99'}, 6000);
+    }
+    function show_hide_rows(attr_val, link_id){
+      $('#'+attr_val).toggle();
+      if ($('#'+attr_val).is(':visible')) {
+        $('#'+link_id).attr('src', downImage);
+      }else{
+        $('#'+link_id).attr('src', rightImage);
+      }
+    }
+    function mask(label){
+      $('body').mask(label);
+    }
+    function unmask(){
+      $('body').unmask();
+    }
+    var winHeight = "auto";
+    var winWidth = "auto";
+    var maxHeight = 700;
+    var maxWidth = 1400;
+    var minHeight = 100;
+    var minWidth = 200;
+    
+    var modalOptions = {"width": winWidth,
+                        "height": winHeight,
+                        "maxHeight": maxHeight,
+                        "maxWidth": maxWidth,
+                        "minHeight": minHeight,
+                        "minWidth": minWidth};
+    function dialog(url, title){
+      $("#stats_app_dialog").dialog({modal:true, minWidth:minWidth, minHeight:minHeight, maxWidth:maxWidth, maxHeight:maxHeight, width:winWidth, height:winHeight, title:title, closeOnEscape: false});
+    
+      modalOptions.title = title;
+    
+      $("#stats_app_dialog").dialog("option", modalOptions);
+    
+      $("#stats_app_dialog").html("Loading...");
+      $("#stats_app_dialog").load(url).dialog('open');
+    }
+    function addDatePicker(){
+    $('.adddatepicker').each(function(i, obj){
+      $(obj).datepicker({ 
+        showOn: 'both', 
+        buttonImage: '/assets/calendar.gif', 
+        buttonImageOnly: true,
+      });
+    });
+    }
+   $(document).ready(function() {
+     addDatePicker();
+     $('.chosen-select').chosen({allow_single_deselect: true, search_contains: true});
+   });
+   function setClassInputFields(){
+     addDatePicker();
+     $('.chosen-select').chosen({allow_single_deselect: true, search_contains: true});
+   }
+  </script>
+  <body id="body" onload="if (top != self) { top.location=self.location; }">
+    <div id="header"><img alt="Titlebar_logo" height="81" src="/assets/titlebar_logo-d1d40bd2268e265b6a42cacb7bb117e9.jpg" style="float: left" width="104" />
+      <h1>
+        <span id="title1">NCAA</span><br/>
+        <span id="title2">Statistics</span>
+      </h1>
+      <div id="nav">
+  <ul>
+     <li id="notactive">
+       <a href="/rankings?academic_year=2018&amp;sport_code=WBB"><span>National Rankings</span></a>
+    </li>
+     <li id="notactive">
+       <a href="/active_career_leaders/show_summary_from_rankings?academic_year=2018&amp;sport_code=WBB"><span>Active Career Leaders</span></a> 
+    </li>
+    <li id="notactive">
+      <a href="/contests/scoreboards"><span>Scoreboard</span></a> 
+    </li>
+    <li id="notactive">
+      <a href="/head_coaches"><span>Head Coaches</span></a> 
+    </li>
+    <li id="team_search">
+      <script>
+  $(function() {
+    $( "#org_name" ).autocomplete({
+      source: '/team/search',
+      select: function( event, ui ) {
+        $("#org_id").val(ui.item.vid);
+        $("#id").val(ui.item.vid);
+        $('#sport_btn').click();
+      }
+    });
+  });
+</script>
+<span style="display:inline; float:right;">
+  <form accept-charset="UTF-8" action="/team/index" id="change_team_form" method="post" onsubmit="mask(&#x27;Loading&#x27;);" style="display:inline;"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /><input name="authenticity_token" type="hidden" value="+cAVXGMu7+aHy6yylv5xpK/aBhzBC3WBNYIZCeATNjE=" /></div>
+  <div style="display:none;">
+  <input id="sport_btn" name="commit" type="submit" value="Submit" />
+  </div>
+    <div id="team_autocomplete" class="ui-widget">
+      <span style="color: #ccc;">Team Search:</span>
+      <input id="org_name" name="org_name" style="width:200px" type="text" />
+      <input id="org_id" name="org_id" type="hidden" />
+    </div>
+</form></span>
+    </li>
+  <li>
+  <a href="http://twitter.com/ncaastats" target="TWITTER"><img alt="Twitter" height="17" src="/assets/twitter-6586be4273539dff7a95e70ebdf1a846.png" width="46" /></a>
+  </li>
+  </ul>
+</div>
+</div>
+    <div id="contentarea">
+       <div id="stats_app_dialog" style="display:none;">
+        </div>
+      <div id="message_box" class="teams"  style="display: none" >
+        <span class="message_box_success"></span>
+        <span class="message_box_error"></span>
+      </div>
+      <script>
+  function submit_form(val){
+    curr_action = '/teams/';
+    $('#change_sport_form').attr("action", curr_action + val);
+    $('#team_sport_btn').click();
+  }
+  $(function() {
+    $( "#org_sport_name" ).autocomplete({
+      source: '/team/12911/sport_sponsored_search',
+      select: function( event, ui ) {
+        $("#sport_search_org_id").val(ui.item.vid);
+        //curr_action = '/teams/'.replace("694", ui.item.vid);
+        curr_action = '/teams/'+ui.item.vid;
+        //$('#change_sport_form').attr("action", curr_action + $('#sport_list').val());
+        $('#change_sport_form').attr("action", curr_action);
+        $('#team_sport_btn').click();
+      }
+    });
+  });
+</script>
+<fieldset>
+  <legend><a href="http://www.utsports.com" target="ATHLETICS_URL">Tennessee Lady Volunteers</a> (25-8) </legend>
+<div>
+  <form accept-charset="UTF-8" action="http://stats.ncaa.org" id="change_sport_form" method="get" onsubmit="mask(&#x27;Loading&#x27;);"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /></div>
+    <select id="year_list" name="year_id" onchange="submit_form(this.value);"><option value="185506" selected="selected">2017-18</option>
+<option value="109675">2016-17</option>
+<option value="23102">2015-16</option>
+<option value="16873">2014-15</option>
+<option value="37942">2013-14</option>
+<option value="77554">2012-13</option>
+<option value="30537">2011-12</option>
+<option value="55809">2010-11</option>
+<option value="52424">2009-10</option>
+<option value="44018">2008-09</option>
+<option value="69203">2007-08</option>
+<option value="90049">2006-07</option>
+<option value="89007">2005-06</option>
+<option value="93100">2004-05</option>
+<option value="50082">2003-04</option>
+<option value="48078">2002-03</option>
+<option value="46073">2001-02</option>
+<option value="145047">2000-01</option>
+<option value="184594">1999-00</option>
+<option value="340091">1998-99</option>
+<option value="183585">1997-98</option>
+<option value="262290">1996-97</option>
+<option value="375174">1995-96</option>
+<option value="261339">1994-95</option>
+<option value="149431">1993-94</option>
+<option value="377084">1992-93</option>
+<option value="148545">1991-92</option>
+<option value="376213">1990-91</option>
+<option value="147695">1989-90</option>
+<option value="306183">1988-89</option>
+<option value="146859">1987-88</option>
+<option value="305356">1986-87</option>
+<option value="304528">1985-86</option>
+<option value="146036">1984-85</option>
+<option value="303718">1983-84</option>
+<option value="410466">1982-83</option>
+<option value="341021">1981-82</option>
+<option value="410960">1980-81</option>
+<option value="341475">1979-80</option>
+<option value="306677">1978-79</option>
+<option value="262957">1977-78</option>
+<option value="307157">1976-77</option>
+<option value="341781">1975-76</option>
+<option value="377516">1974-75</option>
+<option value="306884">1973-74</option>
+<option value="224125">1972-73</option>
+<option value="377650">1971-72</option>
+<option value="307290">1970-71</option>
+<option value="263103">1969-70</option>
+<option value="377706">1968-69</option>
+<option value="341889">1967-68</option>
+<option value="224178">1966-67</option>
+<option value="341864">1965-66</option>
+<option value="263060">1964-65</option>
+<option value="307317">1963-64</option>
+<option value="307352">1962-63</option>
+<option value="411119">1961-62</option>
+<option value="377737">1960-61</option>
+<option value="224195">1959-60</option>
+<option value="149752">1958-59</option>
+<option value="149744">1957-58</option>
+<option value="411110">1956-57</option>
+<option value="341905">1955-56</option>
+<option value="411103">1954-55</option>
+<option value="307343">1953-54</option>
+<option value="307336">1952-53</option>
+<option value="411096">1951-52</option>
+<option value="307329">1950-51</option>
+<option value="224186">1949-50</option>
+<option value="341898">1948-49</option>
+<option value="377728">1947-48</option>
+<option value="149736">1946-47</option>
+<option value="263132">1945-46</option>
+<option value="263127">1944-45</option>
+<option value="411090">1943-44</option>
+<option value="307323">1942-43</option>
+<option value="377723">1941-42</option>
+<option value="411085">1940-41</option>
+<option value="411080">1939-40</option>
+<option value="377718">1938-39</option>
+<option value="263122">1937-38</option>
+<option value="149731">1936-37</option>
+<option value="307365">1935-36</option>
+<option value="411135">1934-35</option>
+<option value="341910">1933-34</option>
+<option value="307361">1932-33</option>
+<option value="149777">1931-32</option>
+<option value="411130">1930-31</option>
+<option value="149770">1929-30</option>
+<option value="149763">1928-29</option>
+<option value="186341">1927-28</option>
+<option value="377746">1926-27</option>
+<option value="149756">1925-26</option>
+<option value="224199">1924-25</option>
+<option value="186336">1923-24</option>
+<option value="411123">1922-23</option>
+<option value="377741">1921-22</option>
+<option value="307356">1920-21</option>
+<option value="411137">1919-20</option>
+<option value="307371">1918-19</option>
+<option value="224203">1917-18</option>
+<option value="307369">1916-17</option>
+<option value="149783">1915-16</option>
+<option value="149780">1914-15</option>
+<option value="186347">1913-14</option>
+<option value="186345">1912-13</option>
+<option value="377750">1911-12</option>
+<option value="263135">1910-11</option>
+<option value="307367">1909-10</option>
+<option value="149786">1908-09</option>
+<option value="274293">1907-08</option>
+<option value="318012">1906-07</option>
+<option value="418334">1905-06</option>
+<option value="418333">1904-05</option>
+<option value="194478">1903-04</option>
+<option value="230700">1902-03</option></select>
+    <select id="sport_list" name="sport_id" onchange="submit_form(this.value);"><option value="26277">Women&#x27;s Soccer</option>
+<option value="111219">Men&#x27;s Basketball</option>
+<option value="112301">Women&#x27;s Volleyball</option>
+<option value="197683">Baseball</option>
+<option value="312548">Softball</option>
+<option value="113627">Football</option>
+<option value="185506" selected="selected">Women&#x27;s Basketball</option></select>
+    <a href="/teams/history/WBB/694">Team History</a> |
+    <a href="/teams/coaches_summary/WBB/694">Coaches Summary</a>
+  <div style="display:none;">
+  <input id="team_sport_btn" name="commit" type="submit" value="Submit" />
+  </div>
+  <span id="tst" style="float:right;">
+    <div id="team_sport_autocomplete" class="ui-widget">
+      Teams Sponsoring Women&#x27;s Basketball:
+      <input id="org_sport_name" name="org_sport_name" style="width:200px" type="text" />
+      <input id="sport_search_org_id" name="org_id" type="hidden" />
+    </div>
+  </span>
+</form></div>
+<div style="clear: both;">
+<div id="facility_div" style="width: 48%; float: left">
+  <div id="team_venues_185506">
+<fieldset>
+  <legend>Arena</legend>
+  <div id="team_venue_89696">
+  <label>Name</label> Thompson-Boling Arena
+  <br/>
+  <label>Capacity</label> 21,678<br/>
+  <label>Year Built</label> 1987<br/>
+  <label>Primary Venue</label> true<br/>
+</div>
+</fieldset>
+</div>
+</div>
+<div id="head_coaches_div" style="width: 48%; float: right">
+  <fieldset>
+  <legend>Head Coach</legend>
+    <label for="Name:">Name:</label> <a href="/people/40451?sport_code=WBB">Holly Warlick</a><br/>
+  <label for="Alma_Mater:">Alma mater:</label> Tennessee - 1981<br/>
+  <label for="Seasons:">Seasons:</label> 6<br/>
+  <label for="Record:">Record:</label> 153-54<br/>
+  <span class="italic">
+  *Record and year's coaching are thru 2017-18 season.
+  </span>
+    </fieldset>
+</div>
+</div>
+</fieldset>
+<br/>
+Schedule/Results |
+<a href="/team/694/roster/12911">Roster</a> |
+<a href="/team/694/stats/12911">Team Statistics</a> |
+<a href="/player/game_by_game?game_sport_year_ctl_id=12911&amp;org_id=694&amp;stats_player_seq=-100">Game By Game</a> |
+<!--
+<a href="/team/team_game_highs?org_id=694&amp;sport_year_ctl_id=12911">Game Highs</a> |
+<a href="/team/conf_game_highs?org_id=694&amp;sport_year_ctl_id=12911">Conf Game Highs</a> |
+<a href="/player/player_rank_history?game_sport_year_ctl_id=12911&amp;index_start=0&amp;org_id=694&amp;stat_seq_to_chart=0&amp;stats_player_seq=-100">Ranking Trends</a> |
+<a href="/player/team_player_rank_yearly_history?game_sport_year_ctl_id=12911&amp;index_start=0&amp;org_id=694&amp;stat_seq_to_chart=0&amp;stats_player_seq=-100">Team Final Trends</a> |
+-->
+   <a href="/rankings/ranking_summary?academic_year=2018&amp;division=1&amp;org_id=694&amp;ranking_period=102&amp;sport_code=WBB">Ranking Summary</a>
+<table width="90%">
+  <!--
+  <tr>
+    <td colspan="2">
+            <script>
+  function submit_form(val){
+    curr_action = 'http://stats.ncaa.org/teams/';
+    $('#change_sport_form').attr("action", curr_action + val);
+    $('#team_sport_btn').click();
+  }
+      </script>
+<form accept-charset="UTF-8" action="http://stats.ncaa.org/teams" id="change_sport_form" method="get" onsubmit="mask(&#x27;Loading&#x27;);"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /></div>
+  <select id="sport_list" name="id" onchange="submit_form(this.value);"><option value="230700">1902-03</option>
+<option value="194478">1903-04</option>
+<option value="418333">1904-05</option>
+<option value="418334">1905-06</option>
+<option value="318012">1906-07</option>
+<option value="274293">1907-08</option>
+<option value="149786">1908-09</option>
+<option value="307367">1909-10</option>
+<option value="263135">1910-11</option>
+<option value="377750">1911-12</option>
+<option value="186345">1912-13</option>
+<option value="186347">1913-14</option>
+<option value="149780">1914-15</option>
+<option value="149783">1915-16</option>
+<option value="307369">1916-17</option>
+<option value="224203">1917-18</option>
+<option value="307371">1918-19</option>
+<option value="411137">1919-20</option>
+<option value="307356">1920-21</option>
+<option value="377741">1921-22</option>
+<option value="411123">1922-23</option>
+<option value="186336">1923-24</option>
+<option value="224199">1924-25</option>
+<option value="149756">1925-26</option>
+<option value="377746">1926-27</option>
+<option value="186341">1927-28</option>
+<option value="149763">1928-29</option>
+<option value="149770">1929-30</option>
+<option value="411130">1930-31</option>
+<option value="149777">1931-32</option>
+<option value="307361">1932-33</option>
+<option value="341910">1933-34</option>
+<option value="411135">1934-35</option>
+<option value="307365">1935-36</option>
+<option value="149731">1936-37</option>
+<option value="263122">1937-38</option>
+<option value="377718">1938-39</option>
+<option value="411080">1939-40</option>
+<option value="411085">1940-41</option>
+<option value="377723">1941-42</option>
+<option value="307323">1942-43</option>
+<option value="411090">1943-44</option>
+<option value="263127">1944-45</option>
+<option value="263132">1945-46</option>
+<option value="149736">1946-47</option>
+<option value="377728">1947-48</option>
+<option value="341898">1948-49</option>
+<option value="224186">1949-50</option>
+<option value="307329">1950-51</option>
+<option value="411096">1951-52</option>
+<option value="307336">1952-53</option>
+<option value="307343">1953-54</option>
+<option value="411103">1954-55</option>
+<option value="341905">1955-56</option>
+<option value="411110">1956-57</option>
+<option value="149744">1957-58</option>
+<option value="149752">1958-59</option>
+<option value="224195">1959-60</option>
+<option value="377737">1960-61</option>
+<option value="411119">1961-62</option>
+<option value="307352">1962-63</option>
+<option value="307317">1963-64</option>
+<option value="263060">1964-65</option>
+<option value="341864">1965-66</option>
+<option value="224178">1966-67</option>
+<option value="341889">1967-68</option>
+<option value="377706">1968-69</option>
+<option value="263103">1969-70</option>
+<option value="307290">1970-71</option>
+<option value="377650">1971-72</option>
+<option value="224125">1972-73</option>
+<option value="306884">1973-74</option>
+<option value="377516">1974-75</option>
+<option value="341781">1975-76</option>
+<option value="307157">1976-77</option>
+<option value="262957">1977-78</option>
+<option value="306677">1978-79</option>
+<option value="341475">1979-80</option>
+<option value="410960">1980-81</option>
+<option value="341021">1981-82</option>
+<option value="410466">1982-83</option>
+<option value="303718">1983-84</option>
+<option value="146036">1984-85</option>
+<option value="304528">1985-86</option>
+<option value="305356">1986-87</option>
+<option value="146859">1987-88</option>
+<option value="306183">1988-89</option>
+<option value="147695">1989-90</option>
+<option value="376213">1990-91</option>
+<option value="148545">1991-92</option>
+<option value="377084">1992-93</option>
+<option value="149431">1993-94</option>
+<option value="261339">1994-95</option>
+<option value="375174">1995-96</option>
+<option value="262290">1996-97</option>
+<option value="183585">1997-98</option>
+<option value="340091">1998-99</option>
+<option value="184594">1999-00</option>
+<option value="145047">2000-01</option>
+<option value="46073">2001-02</option>
+<option value="48078">2002-03</option>
+<option value="50082">2003-04</option>
+<option value="93100">2004-05</option>
+<option value="89007">2005-06</option>
+<option value="90049">2006-07</option>
+<option value="69203">2007-08</option>
+<option value="44018">2008-09</option>
+<option value="52424">2009-10</option>
+<option value="55809">2010-11</option>
+<option value="30537">2011-12</option>
+<option value="77554">2012-13</option>
+<option value="37942">2013-14</option>
+<option value="16873">2014-15</option>
+<option value="23102">2015-16</option>
+<option value="109675">2016-17</option>
+<option value="185506" selected="selected">2017-18</option>
+<option value="451842">2018-19</option></select>
+  <div style="display:none;">
+  <input id="team_sport_btn" name="commit" type="submit" value="Submit" />
+  </div>
+</form>
+    </td>
+  </tr>
+  -->
+  <tr>
+   <td width="50%" valign="top">
+           <table class="mytable" width="100%" align="center">
+	     <tr class="heading">
+           <td colspan="3">Schedule/Results
+           </td>
+		 </tr>
+	     <tr class="grey_heading">
+		    <th width="8%">Date</th>
+		    <th width="20%" align="center">Opponent</th>
+		    <th width="6%" align="center">Result</th>
+		 </tr>
+          <tr >
+           <td class="smtext">11/12/2017</td>
+           <td class="smtext">
+             
+                     <a href="/team/198/12911"> ETSU </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4442611?org_id=694" class="skipMask" target="TEAM_WIN">W 87 - 49 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">11/15/2017</td>
+           <td class="smtext">
+             
+                     <a href="/team/317/12911"> James Madison </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4444533?org_id=694" class="skipMask" target="TEAM_WIN">W 89 - 60 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">11/20/2017</td>
+           <td class="smtext">
+             
+                     <a href="/team/782/12911"> Wichita St. </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4448929?org_id=694" class="skipMask" target="TEAM_WIN">W 68 - 56 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">11/23/2017</td>
+           <td class="smtext">
+             
+                     <a href="/team/387/12911"> Marquette <br/>@ Hard Rock Hotel Riviera Maya</a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4450660?org_id=694" class="skipMask" target="TEAM_WIN">W 101 - 99 (1OT)</a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">11/24/2017</td>
+           <td class="smtext">
+             
+                     <a href="/team/521/12911"> Oklahoma St. <br/>@ Hard Rock Hotel Riviera Maya</a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4455106?org_id=521" class="skipMask" target="TEAM_WIN">W 79 - 69 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">11/25/2017</td>
+           <td class="smtext">
+             
+                     <a href="/team/650/12911"> South Dakota <br/>@ Hard Rock Hotel Riviera Maya</a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4451539?org_id=694" class="skipMask" target="TEAM_WIN">W 69 - 49 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">11/30/2017</td>
+           <td class="smtext">
+             
+                     <a href="/team/1004/12911"> Central Ark. </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4454678?org_id=694" class="skipMask" target="TEAM_WIN">W 77 - 34 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">12/03/2017</td>
+           <td class="smtext">
+             
+                     <a href="/team/7/12911"> Alabama St. </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4456668?org_id=694" class="skipMask" target="TEAM_WIN">W 104 - 51 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">12/06/2017</td>
+           <td class="smtext">
+             
+                     <a href="/team/716/12911"> Troy </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4458326?org_id=694" class="skipMask" target="TEAM_WIN">W 131 - 69 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">12/10/2017</td>
+           <td class="smtext">
+             
+                     <a href="/team/703/12911"> Texas </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4460660?org_id=694" class="skipMask" target="TEAM_WIN">W 82 - 75 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">12/17/2017</td>
+           <td class="smtext">
+             
+                     <a href="/team/99/12911">@ Long Beach St. </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4463222?org_id=99" class="skipMask" target="TEAM_WIN">W 90 - 61 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">12/21/2017</td>
+           <td class="smtext">
+             
+                     <a href="/team/674/12911">@ Stanford </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4465016?org_id=674" class="skipMask" target="TEAM_WIN">W 83 - 71 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">12/31/2017</td>
+           <td class="smtext">
+             
+                     <a href="/team/334/12911">@ Kentucky </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4467164?org_id=334" class="skipMask" target="TEAM_WIN">W 63 - 49 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">01/04/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/37/12911"> Auburn </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4469056?org_id=694" class="skipMask" target="TEAM_WIN">W 70 - 59 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">01/07/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/736/12911"> Vanderbilt </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4470914?org_id=694" class="skipMask" target="TEAM_WIN">W 86 - 73 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">01/11/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/697/12911">@ Texas A&M </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4473129?org_id=697" class="skipMask" target="TEAM_WIN">L 76 - 79 (1OT)</a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">01/14/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/648/12911">@ South Carolina </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4474975?org_id=648" class="skipMask" target="TEAM_WIN">W 86 - 70 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">01/18/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/513/12911">@ Notre Dame </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4476981?org_id=513" class="skipMask" target="TEAM_WIN">L 70 - 84 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">01/21/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/430/12911"> Mississippi St. </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4478869?org_id=694" class="skipMask" target="TEAM_WIN">L 52 - 71 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">01/25/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/433/12911"> Ole Miss </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4480891?org_id=694" class="skipMask" target="TEAM_WIN">W 75 - 66 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">01/28/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/365/12911">@ LSU </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4482917?org_id=365" class="skipMask" target="TEAM_WIN">L 59 - 70 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">02/01/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/697/12911"> Texas A&M </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4486860?org_id=694" class="skipMask" target="TEAM_WIN">W 82 - 67 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">02/04/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/736/12911">@ Vanderbilt </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4487474?org_id=736" class="skipMask" target="TEAM_WIN">W 74 - 64 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">02/08/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/31/12911">@ Arkansas </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4489883?org_id=31" class="skipMask" target="TEAM_WIN">W 90 - 85 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">02/11/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/257/12911"> Georgia </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4492740?org_id=694" class="skipMask" target="TEAM_WIN">W 62 - 46 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">02/15/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/8/12911"> Alabama </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4495483?org_id=694" class="skipMask" target="TEAM_WIN">L 63 - 72 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">02/18/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/434/12911">@ Missouri </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4500220?org_id=434" class="skipMask" target="TEAM_WIN">L 73 - 77 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">02/22/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/235/12911">@ Florida </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4502845?org_id=235" class="skipMask" target="TEAM_WIN">W 70 - 42 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">02/25/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/648/12911"> South Carolina </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4506909?org_id=694" class="skipMask" target="TEAM_WIN">W 65 - 46 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">03/01/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/37/12911"> Auburn <br/>@ Nashville, Tenn. (Bridgestone Arena)</a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4510627?org_id=694" class="skipMask" target="TEAM_WIN">W 64 - 61 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">03/02/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/648/12911"> South Carolina <br/>@ BRIDGESTONE ARENA - NASHVILLE, TN</a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4511579?org_id=648" class="skipMask" target="TEAM_WIN">L 62 - 73 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">03/16/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/355/12911"> Liberty </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4527903?org_id=694" class="skipMask" target="TEAM_WIN">W 100 - 60 </a>
+           </td>
+ 
+	     </tr>
+          <tr >
+           <td class="smtext">03/18/2018</td>
+           <td class="smtext">
+             
+                     <a href="/team/528/12911"> Oregon St. </a>
+           </td>
+           <td class="smtext" nowrap>
+                <a href="/game/index/4532221?org_id=694" class="skipMask" target="TEAM_WIN">L 59 - 66 </a>
+           </td>
+ 
+	     </tr>
+	  </table>
+   </td>
+   <td width="50%" valign="top">
+     <table class="mytable" width="100%">
+  <tr class="heading">
+    <td colspan="3">Team Stats - Through games 04/01/2018</td>
+  </tr>
+  <tr class="grey_heading">
+    <td>Stat</td>
+    <td>Rank</td>
+    <td>Value</td>
+  </tr>
+  <tr>
+    <td><a href="/rankings/WBB/2018/1/111/137" class="skipMask" target="Rankings">Scoring Offense</a></td>
+    <td align="right">26</td>
+    <td align="right">
+      77.6
+    </td>
+  </tr>
+  <tr>
+    <td><a href="/rankings/WBB/2018/1/112/137" class="skipMask" target="Rankings">Scoring Defense</a></td>
+    <td align="right">156</td>
+    <td align="right">
+      64.3
+    </td>
+  </tr>
+  <tr>
+    <td><a href="/rankings/WBB/2018/1/113/137" class="skipMask" target="Rankings">Scoring Margin</a></td>
+    <td align="right">25</td>
+    <td align="right">
+      13.3
+    </td>
+  </tr>
+  <tr>
+    <td><a href="/rankings/WBB/2018/1/114/137" class="skipMask" target="Rankings">Field-Goal Percentage</a></td>
+    <td align="right">31</td>
+    <td align="right">
+      45.0
+    </td>
+  </tr>
+  <tr>
+    <td><a href="/rankings/WBB/2018/1/115/137" class="skipMask" target="Rankings">Field-Goal Percentage Defense</a></td>
+    <td align="right">63</td>
+    <td align="right">
+      38.0
+    </td>
+  </tr>
+  <tr>
+    <td><a href="/rankings/WBB/2018/1/116/137" class="skipMask" target="Rankings">Free-Throw Percentage</a></td>
+    <td align="right">184</td>
+    <td align="right">
+      70.1
+    </td>
+  </tr>
+  <tr>
+    <td><a href="/rankings/WBB/2018/1/117/137" class="skipMask" target="Rankings">Rebound Margin</a></td>
+    <td align="right">14</td>
+    <td align="right">
+      8.6
+    </td>
+  </tr>
+  <tr>
+    <td><a href="/rankings/WBB/2018/1/119/137" class="skipMask" target="Rankings">Three-Point Field Goals Per Game</a></td>
+    <td align="right">264</td>
+    <td align="right">
+      4.8
+    </td>
+  </tr>
+  <tr>
+    <td><a href="/rankings/WBB/2018/1/118/137" class="skipMask" target="Rankings">Three-Point Field-Goal Percentage</a></td>
+    <td align="right">207</td>
+    <td align="right">
+      30.7
+    </td>
+  </tr>
+  <tr>
+    <td><a href="/rankings/WBB/2018/1/169/137" class="skipMask" target="Rankings">Won-Lost Percentage</a></td>
+    <td align="right">T-38</td>
+    <td align="right">
+      75.8
+    </td>
+  </tr>
+  <tr>
+    <td><a href="/rankings/WBB/2018/1/472/137" class="skipMask" target="Rankings">Assist Turnover Ratio</a></td>
+    <td align="right">106</td>
+    <td align="right">
+      0.97
+    </td>
+  </tr>
+  <tr>
+    <td><a href="/rankings/WBB/2018/1/516/137" class="skipMask" target="Rankings">Turnover Margin</a></td>
+    <td align="right">181</td>
+    <td align="right">
+      -0.18
+    </td>
+  </tr>
+  <tr class="grey_heading">
+    <td colspan="3"><a href="/rankings/ranking_summary?academic_year=2018.0&amp;division=1.0&amp;game_high=N&amp;org_id=694&amp;ranking_period=137&amp;sport_code=WBB&amp;team_individual=T" class="skipMask" target="RANKINGS_WIN">View Complete Ranking Summary</a></td>
+  </tr>
+</table>
+<br/>
+     
+   </td>
+  </tr>
+</table>
+    </div>
+    <div class="footer"></div>
+  </body>
+  <script>
+      //ui-datepicker = calendar month prev/next buttons, 
+      //ui-corner-all = autocomplete dropdown results
+      //paginate_button = datatables
+    function skipMask(obj){
+      if (obj.hasClass('chosen-single') || obj.hasClass('skipMask') || obj.hasClass('ui-datepicker-prev') || obj.hasClass('ui-datepicker-next') || obj.hasClass('ui-corner-all') || obj.hasClass('paginate_button') || obj.hasClass('dt-button')){
+        return true;
+      }else{
+        return false;
+      }
+    }
+    $(document).ajaxComplete(function(){
+      unmask();
+    });
+/*
+    $("form").on('submit', function(event){
+      if (skipMask($(this))){
+        return;
+      }else{
+        mask('Loading');
+      }
+    });
+    */
+    $(document).on('click', 'a', function(){
+      if (skipMask($(this))){
+        return;
+      }else{
+        mask('Loading');
+      }
+    });
+    $(document).on('click', 'input.green', function(){
+      if (skipMask($(this))){
+        return;
+      }else{
+        mask('Loading');
+      }
+    });
+  </script>
+</html>

@@ -115,7 +115,7 @@ normDf2 <- aggDf
 normDf2$slide <- factor(normDf2$slide, levels = unique(normDf2$slide))
 rfDf <- normDf2[normDf2$type == "rf",]
 for (i in 1:130) {
-  lm.rfBySlide <- lm(rfdf[,i] ~ slide, data = rfDf)
+  lm.rfBySlide <- lm(rfDf[,i] ~ slide, data = rfDf)
   out <- summary(lm.rfBySlide)
   baselineMean <- out$coefficients[,1][1]
   rfMeans <- unlist(lapply(out$coefficients[,1], function(x) {baselineMean + x}))
