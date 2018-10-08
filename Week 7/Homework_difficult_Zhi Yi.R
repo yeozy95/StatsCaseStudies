@@ -34,14 +34,16 @@ cleanBballData <- function(x){
 # Apply the cleaning function to all the data
 y <- lapply(all, cleanBballData)
 z <- do.call(rbind, y)
+# write.csv(z, "basketball_cleaned_ZhiYi.csv", row.names = FALSE)
 # Take the dataframe with names and ID from the previous exercise
-team.name.id <- read.csv("team_name_id.csv", as.is = TRUE)
+# team.name.id <- read.csv("team_name_id.csv", as.is = TRUE)
 # There are some opponent.id with names instead of ID. use as.numeric to coerce characters
 # to NA
-z$opponent.id <- as.numeric(z$opponent.id)
+# z$opponent.id <- as.numeric(z$opponent.id)
 # This doesn't work.. can't think of any other way to fix the opponent ID issue
-z$opponent.id <- ifelse(is.na(z$opponent.id), team.name.id[match(trimws(z$opponent), team.name.id$names), "no"],
-                        opponent.id)
+# z$opponent.id <- ifelse(is.na(z$opponent.id), team.name.id[match(trimws(z$opponent), team.name.id$names), "no"],
+#                         opponent.id)
+
 
 
 #
