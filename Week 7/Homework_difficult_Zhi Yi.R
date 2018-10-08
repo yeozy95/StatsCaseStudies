@@ -14,9 +14,13 @@ cleanBballData <- function(x){
                 x[grep("<td class=\"smtext\"(.*)</td>", x)])
   opponent <- x[grep("<td class=\"smtext\">$", x)+2]
   opponent <- gsub(".*/team/\\d*/12911\">(.*)</a>", "\\1", opponent)
+  opponent <- ifelse(grepl("@", opponent), ifelse(grepl("<br/>", opponent),
+                                                  gsub("(.*?)<br/>.*", "\\1", opponent),
+                                                  gsub(".*@ (.*)", "\\1", opponent)),
+                     opponent)
   opponent.id <- x[grep("<td class=\"smtext\">$", x)+2]
   opponent.id <- gsub(".*/team/(\\d*)/12911\".*", "\\1", opponent.id)
-  tmp <- data.frame(team.name, team.id, opponent, 
+  tmp <- data.frame(team.name, date = dates, team.id, opponent, 
                     opponent.id, scores, stringsAsFactors = FALSE)
   tmp$location <- ifelse(grepl("@", tmp$opponent), gsub(".*@(.*)", "\\1", tmp$opponent),
                          tmp$opponent)
@@ -27,8 +31,19 @@ cleanBballData <- function(x){
   return(tmp)
 }
 
+# Apply the cleaning function to all the data
 y <- lapply(all, cleanBballData)
 z <- do.call(rbind, y)
+# Take the dataframe with names and ID from the previous exercise
+team.name.id <- read.csv("team_name_id.csv", as.is = TRUE)
+# There are some opponent.id with names instead of ID. use as.numeric to coerce characters
+# to NA
+z$opponent.id <- as.numeric(z$opponent.id)
+# This doesn't work.. can't think of any other way to fix the opponent ID issue
+z$opponent.id <- ifelse(is.na(z$opponent.id), team.name.id[match(trimws(z$opponent), team.name.id$names), "no"],
+                        opponent.id)
+
+
 #
 # Hoops Challenge (difficult version)
 #
